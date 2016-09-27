@@ -18,7 +18,7 @@ class VoxelGrid:
         for x in range(0, size_x):
             for y in range(0, size_y):
                 for z in range(0, size_z):
-                    self.grid[x][y][z] = np.sum(img_array[x * size: (x + 1) * size,y * size: (y + 1) * size,z * size: (z + 1) * size,0])
+                    self.grid[x][y][z] = np.sum(img_array[x * size: (x + 1) * size, y * size: (y + 1) * size, z * size: (z + 1) * size, 0])
 
     def __str__(self):
 

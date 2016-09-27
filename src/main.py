@@ -1,6 +1,10 @@
 import os
 import numpy as np
 import nibabel as nib
+from sklearn.decomposition import PCA
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from voxel_grid import VoxelGrid
 
@@ -16,13 +20,48 @@ numbers.pop(len(numbers) - 1)
 vectorized_int = np.vectorize(int)
 target_ages = vectorized_int(numbers)
 
+feature_vectors = []
+
 for i in range(1, 279):
-    img = nib.load("../data/set_train/train_" + str(i) + ".nii")
-    grid = VoxelGrid(img, grid_size)
-
     save_path = "../data/features/grid_size_" + str(grid_size)
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    try:
+        vector = np.load(save_path + "/feature_vector_" + str(i) + ".npy")
+    except:
+        break
+    feature_vectors.append(vector)
 
-    np.save(save_path + "/feature_vector_" + str(i), grid.get_feature_vector())
-    print("Saved feature vector #" + str(i))
+if len(feature_vectors) < 278:
+    for i in range(1, 279):
+        img = nib.load("../data/set_train/train_" + str(i) + ".nii")
+        grid = VoxelGrid(img, grid_size)
+
+        save_path = "../data/features/grid_size_" + str(grid_size)
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+        feature_vectors.append(grid.get_feature_vector())
+        np.save(save_path + "/feature_vector_" + str(i), feature_vectors[i - 1])
+        print("Saved feature vector #" + str(i))
+
+X = np.array(feature_vectors)
+pca = PCA(n_components=3)
+pca.fit(X)
+reduced_X = pca.transform(X)
+
+figure = plt.figure()
+ax = figure.add_subplot(111, projection='3d')
+
+reduced_X_x = reduced_X[:, 0:1]
+reduced_X_y = reduced_X[:, 1:2]
+reduced_X_z = reduced_X[:, 2:3]
+
+color = np.zeros((278, 3))
+max_age = np.max(target_ages)
+min_age = np.min(target_ages)
+
+for i in range(0, 278):
+    color[i][0] = float(target_ages[i] - min_age) / (max_age - min_age)
+    color[i][2] = 1.0 - float(target_ages[i] - min_age) / (max_age - min_age)
+
+ax.scatter(reduced_X_x, reduced_X_y, reduced_X_z, c=color)
+plt.show()
