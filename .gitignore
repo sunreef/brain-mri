@@ -1,2 +1,4 @@
 data/
 .idea/
+src/*.pyc
+src/neural_nets/
