@@ -2,12 +2,10 @@ import numpy as np
 
 
 class VoxelGrid:
-    def __init__(self, img, size=16):
+    def __init__(self, img_array, size=16):
         self.voxelSize = size
 
-        img_array = np.array(img.dataobj)
-
-        size_x, size_y, size_z, dim = img.shape
+        size_x, size_y, size_z, dim = img_array.shape
 
         size_x /= size
         size_y /= size

@@ -30,12 +30,12 @@ def try_params(X, y):
     lowest_mse = sys.maxint
     mlps = Queue.Queue(maxsize = 10) # Top 10.
 
-    for i in range(10000):
+    for i in range(1000):
         if i % 100 == 0:
             print("Loop: " + str(i))
 
         # Monte Carlo the # of layers and neurons
-        num_hidden_layers = randint(1, 12)
+        num_hidden_layers = randint(1, 3)
         layer_structure = [0] * num_hidden_layers
         for i in range(num_hidden_layers):
             layer_structure[i] = randint(1, 20)
