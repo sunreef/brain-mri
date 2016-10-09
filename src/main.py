@@ -4,6 +4,7 @@ import nibabel as nib
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 import neural_net as nn
+import regression as reg
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -127,5 +128,9 @@ reduced_scaled_X = MinMaxScaler((0, 100)).fit_transform(reduced_X)
 reduced_scaled_X_test = MinMaxScaler((0, 100)).fit_transform(reduced_X_test)
 
 # Neural Net
-nn.try_params(reduced_scaled_X, target_ages)
-nn.output_test_predictions(reduced_scaled_X, target_ages, reduced_scaled_X_test, 10)
+#nn.try_params(reduced_scaled_X, target_ages)
+#nn.output_test_predictions(reduced_scaled_X, target_ages, reduced_scaled_X_test)
+
+# Regression
+#reg.ridge(reduced_scaled_X, target_ages)
+#reg.lasso(reduced_scaled_X, target_ages)

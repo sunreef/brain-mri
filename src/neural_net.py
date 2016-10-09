@@ -3,7 +3,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import make_scorer
 import pickle
-import sys
+import sys, os
 import Queue
 from random import randint, random
 
@@ -13,9 +13,13 @@ params = {'activation':'relu', 'solver':'lbfgs', 'batch_size':'auto',
           'nesterovs_momentum':True, 'early_stopping':False, 'validation_fraction':0.1, 'beta_1':0.9,
           'beta_2':0.999, 'epsilon':1e-08}
 
-def output_test_predictions(X, y, X_test, number_of_nn):
-    for i in range(number_of_nn):
-        nn = pickle.load(open('../stored_neural_nets/nn' + str(i) + '.pkl', 'rb'))
+def output_test_predictions(X, y, X_test):
+    for i in range(10):
+        try:
+            nn = pickle.load(open('../stored_neural_nets/nn' + str(i) + '.pkl', 'rb'))
+        except IOError:
+            break
+
         nn.fit(X, y)
         y_test = nn.predict(X_test)
 
@@ -30,15 +34,15 @@ def try_params(X, y):
     lowest_mse = sys.maxint
     mlps = Queue.Queue(maxsize = 10) # Top 10.
 
-    for i in range(1000):
-        if i % 100 == 0:
-            print("Loop: " + str(i))
+    for i in range(30):
+        if i % 5 == 0:
+            print("NN Loop: " + str(i))
 
         # Monte Carlo the # of layers and neurons
-        num_hidden_layers = randint(1, 3)
+        num_hidden_layers = randint(1, 20)
         layer_structure = [0] * num_hidden_layers
         for i in range(num_hidden_layers):
-            layer_structure[i] = randint(1, 20)
+            layer_structure[i] = randint(1, 40)
 
         # Monte Carlo the value for alpha [0, 0.25)
         alpha = random() / 4
@@ -61,12 +65,12 @@ def try_params(X, y):
                 mlps.get()
 
             mlps.put(mlp)
-            # pickle.dump(mlp, open('neural_nets/nn.pkl', 'wb'))
 
     counter = 0
     while(not mlps.empty()):
         best_nn = mlps.get()
         if mlps.qsize() == 0:
+            print("Best Neural Net Params:")
             print(best_nn.get_params())
         if not os.path.exists("../stored_neural_nets/"):
             os.makedirs("../stored_neural_nets/")    
@@ -74,7 +78,3 @@ def try_params(X, y):
         counter = counter + 1
 
     print("Lowest Error: " + str(lowest_mse))
-
-    # Train on all data.
-    # best_nn.fit(X, y)
-    # return best_nn
